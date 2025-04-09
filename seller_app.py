@@ -11,7 +11,7 @@ def escape_markdown(text):
 st.title("🤖 AI Agents Negotiation")
 
 # Fixed Buyer Agent System Prompt
-buyer_prompt = """Role-play as a buyer agent for Opendoor and start a conversation with me. Your goal is to negotiate the purchase of a home valued at $650,000, aiming for the lowest possible price. Begin by asking the homeowner their proposal.
+buyer_prompt = """Role-play as a buyer agent for Opendoor and start a conversation with the home owner. Your goal is to negotiate the purchase of a home valued at $650,000, aiming for the lowest possible price. Begin by asking the homeowner their proposal.
     
 Your first priority is to get the deal done and the second priority is the price.  Output less than 100 words each time."""
 
