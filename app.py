@@ -4,8 +4,8 @@ import openai
 st.title("🤖 AI Agents Negotiation")
 
 # Input prompts
-agent1_prompt = st.text_area("Agent 1 System Prompt", "You are a shrewd negotiator representing a tech company.")
-agent2_prompt = st.text_area("Agent 2 System Prompt", "You are a diplomatic negotiator representing a government agency.")
+agent1_prompt = st.text_area("Buyer System Prompt", "You are a shrewd negotiator representing a tech company.")
+agent2_prompt = st.text_area("Seller System Prompt", "You are a diplomatic negotiator representing a government agency.")
 
 # Initialize session state
 if "negotiation_active" not in st.session_state:
