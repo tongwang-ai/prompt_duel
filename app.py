@@ -111,7 +111,7 @@ if (
     st.rerun()
 
 # Show final message if rounds exhausted
-if st.session_state.round >= 15 and st.session_state.negotiation_active:
+if st.session_state.round >= 20 and st.session_state.negotiation_active:
     st.session_state.negotiation_active = False
     st.session_state.pending_response = False
     st.success("⚖️ Maximum rounds reached. Negotiation completed.")
