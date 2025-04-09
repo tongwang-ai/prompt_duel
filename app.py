@@ -1,6 +1,6 @@
 import streamlit as st
 import openai
-import html
+
 st.title("🤖 AI Agents Negotiation")
 
 
@@ -54,8 +54,8 @@ if st.session_state.round > 0 or st.session_state.agent1_messages:
             speaker = "Buyer"
         else:
             speaker = "Unknown"
-        escaped_text = html.escape(msg["content"])  # Escape any HTML-sensitive characters
-        st.markdown(f"<b>{speaker}:</b> {escaped_text}", unsafe_allow_html=True)
+        st.write(f"{speaker}: {msg['content']}")
+
 
 
 # Run a round if flagged
