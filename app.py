@@ -2,6 +2,9 @@ import streamlit as st
 import openai
 
 st.title("🤖 AI Agents Negotiation")
+def escape_markdown(text):
+    return re.sub(r"(_)", r"\\\1", text)
+
 
 # Input prompts
 agent1_prompt = st.text_area("Buyer System Prompt", "You are a shrewd negotiator representing a tech company.")
@@ -52,7 +55,8 @@ if st.session_state.round > 0 or st.session_state.agent1_messages:
             speaker = "Buyer"
         else:
             speaker = "Unknown"
-        st.write(f"**{speaker}:** {msg['content']}")
+        escaped = escape_markdown(msg["content"])
+        st.write(f"**{speaker}:** {msg['escaped']}")
 
 # Run a round if flagged
 if (
