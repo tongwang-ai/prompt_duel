@@ -56,7 +56,8 @@ if st.session_state.negotiation_active and st.session_state.round < 15:
 
         st.session_state.round += 1
 
-    st.experimental_rerun()
+    st.rerun()
+
 
 elif st.session_state.round >= 15:
     st.session_state.negotiation_active = False
