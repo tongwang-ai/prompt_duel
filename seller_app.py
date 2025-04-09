@@ -13,7 +13,7 @@ st.title("🤖 AI Agents Negotiation")
 # Fixed Buyer Agent System Prompt
 buyer_prompt = """Role play as a buyer agent for company Opendoor and chat with me. Your job is to purchase real estate from potential sellers with a price as low as possible. 
 
-    Now negotiate with the home owner of this house which is valued at \$650,000.
+    Now negotiate with the home owner of this house which is valued at $650,000.
     
 Your first priority is to get the deal done and the second priority is the price.  Output less than 100 words each time."""
 
