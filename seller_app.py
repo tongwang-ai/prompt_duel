@@ -4,7 +4,7 @@ import openai
 import re
 
 def escape_markdown(text):
-    return re.sub(r'_', r'\\_', text)
+    return re.sub(r'_', r'', text)
 
 
 
