@@ -18,7 +18,7 @@ buyer_prompt = """Role play as a buyer agent for company Opendoor and chat with 
 Your first priority is to get the deal done and the second priority is the price.  Output less than 100 words each time."""
 
 # User inputs Seller Agent System Prompt
-seller_prompt = st.text_area("Seller System Prompt", "You are trying to sell your home to an agent. Your home is valued at \$650,000. Output less than 100 words each time.")
+seller_prompt = st.text_area("Seller System Prompt", "You are trying to sell your home to an agent. Your home is valued at $650,000. Output less than 100 words each time.")
 
 # Initialize session state
 if "negotiation_active" not in st.session_state:
