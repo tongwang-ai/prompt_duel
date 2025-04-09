@@ -85,7 +85,7 @@ if (
             "role": "system",
             "content": (
                 "You are an impartial judge observing a negotiation between two agents (a buyer and a seller). "
-                "Determine if an agreement has been reached. "
+                "Determine if an agreement has been reached on the price of the house. "
                 "Respond with only one word: 'Yes' if there's a clear agreement, or 'No' if not."
             )
         }
