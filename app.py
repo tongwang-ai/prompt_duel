@@ -54,7 +54,7 @@ if st.session_state.round > 0 or st.session_state.agent1_messages:
             speaker = "Buyer"
         else:
             speaker = "Unknown"
-        st.write(f"{speaker}: {msg['content']}")
+        st.write(f"**{speaker}**: {msg['content']}")
 
 
 
