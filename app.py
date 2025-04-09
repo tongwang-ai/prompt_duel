@@ -3,7 +3,7 @@ import openai
 
 st.title("🤖 AI Agents Negotiation")
 
-# Input prompts for both agents
+# Input prompts
 agent1_prompt = st.text_area("Agent 1 System Prompt", "You are a shrewd negotiator representing a tech company.")
 agent2_prompt = st.text_area("Agent 2 System Prompt", "You are a diplomatic negotiator representing a government agency.")
 
@@ -16,8 +16,8 @@ if "agent2_messages" not in st.session_state:
     st.session_state.agent2_messages = []
 if "round" not in st.session_state:
     st.session_state.round = 0
-if "trigger_next_round" not in st.session_state:
-    st.session_state.trigger_next_round = False
+if "pending_response" not in st.session_state:
+    st.session_state.pending_response = False
 
 # Start negotiation
 if st.button("Start Negotiation"):
@@ -30,43 +30,58 @@ if st.button("Start Negotiation"):
     st.session_state.agent2_messages = [
         {"role": "system", "content": agent2_prompt}
     ]
-    st.session_state.trigger_next_round = True
+    st.session_state.pending_response = True
     st.rerun()
 
 # Stop negotiation
 if st.session_state.negotiation_active and st.button("Stop Negotiation"):
     st.session_state.negotiation_active = False
-    st.session_state.trigger_next_round = False
+    st.session_state.pending_response = False
     st.success("Negotiation stopped.")
 
-# Run negotiation if flagged and not done
-if st.session_state.negotiation_active and st.session_state.trigger_next_round and st.session_state.round < 15:
+# Display chat so far
+if st.session_state.round > 0 or st.session_state.agent1_messages:
+    st.subheader("📝 Conversation History")
+    for i in range(1, len(st.session_state.agent1_messages)):
+        if "content" in st.session_state.agent1_messages[i]:
+            st.markdown(f"**Agent 1:** {st.session_state.agent1_messages[i]['content']}")
+        if i < len(st.session_state.agent2_messages) and "content" in st.session_state.agent2_messages[i]:
+            st.markdown(f"**Agent 2:** {st.session_state.agent2_messages[i]['content']}")
+
+# Run a round if flagged
+if (
+    st.session_state.negotiation_active
+    and st.session_state.pending_response
+    and st.session_state.round < 15
+):
     with st.spinner(f"Negotiation round {st.session_state.round + 1}..."):
+
+        # Agent 1 responds
         agent1_response = openai.chat.completions.create(
             model="gpt-4o-mini",
             messages=st.session_state.agent1_messages
         ).choices[0].message.content
 
+        st.session_state.agent1_messages.append({"role": "assistant", "content": agent1_response})
+        st.session_state.agent2_messages.append({"role": "user", "content": agent1_response})
+
+        # Agent 2 responds
         agent2_response = openai.chat.completions.create(
             model="gpt-4o-mini",
-            messages=st.session_state.agent2_messages + [{"role": "user", "content": agent1_response}]
+            messages=st.session_state.agent2_messages
         ).choices[0].message.content
 
-    # Display responses
-    st.markdown(f"**Agent 1:** {agent1_response}")
-    st.markdown(f"**Agent 2:** {agent2_response}")
+        st.session_state.agent2_messages.append({"role": "assistant", "content": agent2_response})
+        st.session_state.agent1_messages.append({"role": "user", "content": agent2_response})
 
-    # Update conversation
-    st.session_state.agent1_messages.append({"role": "user", "content": agent2_response})
-    st.session_state.agent2_messages.append({"role": "user", "content": agent1_response})
+        # Advance round and prepare next
+        st.session_state.round += 1
+        st.session_state.pending_response = True if st.session_state.round < 15 else False
 
-    # Advance round and keep going
-    st.session_state.round += 1
-    st.session_state.trigger_next_round = True  # stay true for next round
     st.rerun()
 
-# If finished
-elif st.session_state.round >= 15 and st.session_state.negotiation_active:
+# Show complete message
+if st.session_state.round >= 15 and st.session_state.negotiation_active:
     st.session_state.negotiation_active = False
-    st.session_state.trigger_next_round = False
-    st.success("Negotiation completed.")
+    st.session_state.pending_response = False
+    st.success("✅ Negotiation completed.")
