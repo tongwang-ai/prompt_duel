@@ -56,7 +56,7 @@ if st.session_state.round > 0 or st.session_state.agent1_messages:
         else:
             speaker = "Unknown"
         escaped = escape_markdown(msg["content"])
-        st.write(f"**{speaker}:** {msg['escaped']}")
+        st.markdown(f"**{speaker}:** {escaped}")
 
 # Run a round if flagged
 if (
