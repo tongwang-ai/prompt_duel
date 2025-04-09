@@ -42,11 +42,19 @@ if st.session_state.negotiation_active and st.button("Stop Negotiation"):
 # Display chat so far
 if st.session_state.round > 0 or st.session_state.agent1_messages:
     st.subheader("📝 Conversation History")
-    for i in range(1, len(st.session_state.agent1_messages)):
-        if "content" in st.session_state.agent1_messages[i]:
-            st.markdown(f"**Agent 1:** {st.session_state.agent1_messages[i]['content']}")
-        if i < len(st.session_state.agent2_messages) and "content" in st.session_state.agent2_messages[i]:
-            st.markdown(f"**Agent 2:** {st.session_state.agent2_messages[i]['content']}")
+    
+    # Use only agent1_messages since it ends up containing the full exchange
+    for i, msg in enumerate(st.session_state.agent1_messages):
+        if msg["role"] == "system":
+            continue
+        if msg["role"] == "user":
+            speaker = "Agent 2"
+        elif msg["role"] == "assistant":
+            speaker = "Agent 1"
+        else:
+            speaker = "Unknown"
+        st.markdown(f"**{speaker}:** {msg['content']}")
+
 
 # Run a round if flagged
 if (
