@@ -16,6 +16,8 @@ if "agent2_messages" not in st.session_state:
     st.session_state.agent2_messages = []
 if "round" not in st.session_state:
     st.session_state.round = 0
+if "trigger_next_round" not in st.session_state:
+    st.session_state.trigger_next_round = False
 
 # Start negotiation
 if st.button("Start Negotiation"):
@@ -28,6 +30,7 @@ if st.button("Start Negotiation"):
     st.session_state.agent2_messages = [
         {"role": "system", "content": agent2_prompt}
     ]
+    st.session_state.trigger_next_round = True
     st.rerun()
 
 # Stop negotiation
@@ -35,34 +38,35 @@ if st.session_state.negotiation_active and st.button("Stop Negotiation"):
     st.session_state.negotiation_active = False
     st.success("Negotiation stopped.")
 
-# Run negotiation rounds
-if st.session_state.negotiation_active and st.session_state.round < 15:
+# Run negotiation if flagged
+if st.session_state.negotiation_active and st.session_state.trigger_next_round and st.session_state.round < 15:
     with st.spinner(f"Negotiation round {st.session_state.round + 1}..."):
-        # Agent 1 replies
         agent1_response = openai.chat.completions.create(
             model="gpt-4o-mini",
             messages=st.session_state.agent1_messages
         ).choices[0].message.content
 
-        # Agent 2 replies (using updated messages)
         agent2_response = openai.chat.completions.create(
             model="gpt-4o-mini",
             messages=st.session_state.agent2_messages + [{"role": "user", "content": agent1_response}]
         ).choices[0].message.content
 
-    # Display responses
+    # Update messages and round
+    st.session_state.agent1_messages.append({"role": "user", "content": agent2_response})
+    st.session_state.agent2_messages.append({"role": "user", "content": agent1_response})
+    st.session_state.round += 1
+
+    # Show outputs this round
     st.markdown(f"**Agent 1:** {agent1_response}")
     st.markdown(f"**Agent 2:** {agent2_response}")
 
-    # Update messages
-    st.session_state.agent1_messages.append({"role": "user", "content": agent2_response})
-    st.session_state.agent2_messages.append({"role": "user", "content": agent1_response})
+    # Trigger next round on next script run
+    st.session_state.trigger_next_round = True
 
-    # Advance round and rerun
-    st.session_state.round += 1
-    st.experimental_rerun()
-
-# Negotiation complete
-elif st.session_state.round >= 15:
+elif st.session_state.negotiation_active and st.session_state.round >= 15:
     st.session_state.negotiation_active = False
+    st.session_state.trigger_next_round = False
     st.success("Negotiation completed.")
+else:
+    # Clear trigger unless in negotiation loop
+    st.session_state.trigger_next_round = False
