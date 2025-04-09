@@ -99,7 +99,7 @@ if (
             "role": "system",
             "content": (
                 "You are an impartial judge observing a negotiation between two agents (a buyer and a seller). "
-                "Determine if an agreement has been reached on the price of the house. "
+                "Determine if an agreement has been reached on the price of the house, which means both the buyer and seller have explicitly agreed on a price. "
                 "Respond with only one word: 'Yes' if there's a clear agreement, or 'No' if not."
             )
         }
@@ -120,7 +120,7 @@ if (
     st.rerun()
 
 # Show final message if rounds exhausted
-if st.session_state.round >= 15 and st.session_state.negotiation_active:
+if st.session_state.round >= 20 and st.session_state.negotiation_active:
     st.session_state.negotiation_active = False
     st.session_state.pending_response = False
     st.success("⚖️ Maximum rounds reached. Negotiation completed.")
