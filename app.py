@@ -43,7 +43,6 @@ if st.session_state.negotiation_active and st.button("Stop Negotiation"):
 if st.session_state.round > 0 or st.session_state.agent1_messages:
     st.subheader("📝 Conversation History")
     
-    # Use only agent1_messages since it ends up containing the full exchange
     for i, msg in enumerate(st.session_state.agent1_messages):
         if msg["role"] == "system":
             continue
@@ -55,7 +54,6 @@ if st.session_state.round > 0 or st.session_state.agent1_messages:
             speaker = "Unknown"
         st.markdown(f"**{speaker}:** {msg['content']}")
 
-
 # Run a round if flagged
 if (
     st.session_state.negotiation_active
@@ -64,7 +62,7 @@ if (
 ):
     with st.spinner(f"Negotiation round {st.session_state.round + 1}..."):
 
-        # Agent 1 responds
+        # Agent 1 (Buyer) responds
         agent1_response = openai.chat.completions.create(
             model="gpt-4o-mini",
             messages=st.session_state.agent1_messages
@@ -73,7 +71,7 @@ if (
         st.session_state.agent1_messages.append({"role": "assistant", "content": agent1_response})
         st.session_state.agent2_messages.append({"role": "user", "content": agent1_response})
 
-        # Agent 2 responds
+        # Agent 2 (Seller) responds
         agent2_response = openai.chat.completions.create(
             model="gpt-4o-mini",
             messages=st.session_state.agent2_messages
@@ -82,14 +80,34 @@ if (
         st.session_state.agent2_messages.append({"role": "assistant", "content": agent2_response})
         st.session_state.agent1_messages.append({"role": "user", "content": agent2_response})
 
-        # Advance round and prepare next
-        st.session_state.round += 1
-        st.session_state.pending_response = True if st.session_state.round < 15 else False
+        # Agreement check after both replies
+        agreement_check_prompt = {
+            "role": "system",
+            "content": (
+                "You are an impartial judge observing a negotiation between two agents (a buyer and a seller). "
+                "Determine if an agreement has been reached. "
+                "Respond with only one word: 'Yes' if there's a clear agreement, or 'No' if not."
+            )
+        }
+
+        check_response = openai.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[agreement_check_prompt] + st.session_state.agent1_messages[-10:]  # use last few messages
+        ).choices[0].message.content.strip().lower()
+
+        if "yes" in check_response:
+            st.session_state.negotiation_active = False
+            st.session_state.pending_response = False
+            st.success("✅ Agreement reached. Negotiation completed.")
+        else:
+            # Continue to next round
+            st.session_state.round += 1
+            st.session_state.pending_response = True if st.session_state.round < 15 else False
 
     st.rerun()
 
-# Show complete message
+# Show final message if rounds exhausted
 if st.session_state.round >= 15 and st.session_state.negotiation_active:
     st.session_state.negotiation_active = False
     st.session_state.pending_response = False
-    st.success("✅ Negotiation completed.")
+    st.success("⚖️ Maximum rounds reached. Negotiation completed.")
