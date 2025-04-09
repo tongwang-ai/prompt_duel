@@ -15,7 +15,7 @@ buyer_prompt = """Role play as a buyer agent for company Opendoor and chat with 
 
     Now negotiate with the home owner of this house which is valued at \$650,000.
     
-But your priority is to get the deal done and the second priority is the price.  Output less than 100 words each time."""
+Your first priority is to get the deal done and the second priority is the price.  Output less than 100 words each time."""
 
 # User inputs Seller Agent System Prompt
 seller_prompt = st.text_area("Seller System Prompt", "You are trying to sell your home to an agent")
