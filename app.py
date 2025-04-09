@@ -36,6 +36,7 @@ if st.session_state.negotiation_active and st.session_state.round < 15:
     with st.spinner(f"Negotiation round {st.session_state.round + 1}..."):
 
         # Agent 1 replies
+        time.sleep(0.5)
         agent1_response = openai.chat.completions.create(
             model="gpt-4o-mini",
             messages=st.session_state.agent1_messages
@@ -44,6 +45,7 @@ if st.session_state.negotiation_active and st.session_state.round < 15:
         st.session_state.agent2_messages.append({"role": "user", "content": agent1_response})
 
         # Agent 2 replies
+        time.sleep(0.5)
         agent2_response = openai.chat.completions.create(
             model="gpt-4o-mini",
             messages=st.session_state.agent2_messages
