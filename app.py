@@ -36,9 +36,10 @@ if st.button("Start Negotiation"):
 # Stop negotiation
 if st.session_state.negotiation_active and st.button("Stop Negotiation"):
     st.session_state.negotiation_active = False
+    st.session_state.trigger_next_round = False
     st.success("Negotiation stopped.")
 
-# Run negotiation if flagged
+# Run negotiation if flagged and not done
 if st.session_state.negotiation_active and st.session_state.trigger_next_round and st.session_state.round < 15:
     with st.spinner(f"Negotiation round {st.session_state.round + 1}..."):
         agent1_response = openai.chat.completions.create(
@@ -51,22 +52,21 @@ if st.session_state.negotiation_active and st.session_state.trigger_next_round a
             messages=st.session_state.agent2_messages + [{"role": "user", "content": agent1_response}]
         ).choices[0].message.content
 
-    # Update messages and round
-    st.session_state.agent1_messages.append({"role": "user", "content": agent2_response})
-    st.session_state.agent2_messages.append({"role": "user", "content": agent1_response})
-    st.session_state.round += 1
-
-    # Show outputs this round
+    # Display responses
     st.markdown(f"**Agent 1:** {agent1_response}")
     st.markdown(f"**Agent 2:** {agent2_response}")
 
-    # Trigger next round on next script run
-    st.session_state.trigger_next_round = True
+    # Update conversation
+    st.session_state.agent1_messages.append({"role": "user", "content": agent2_response})
+    st.session_state.agent2_messages.append({"role": "user", "content": agent1_response})
 
-elif st.session_state.negotiation_active and st.session_state.round >= 15:
+    # Advance round and keep going
+    st.session_state.round += 1
+    st.session_state.trigger_next_round = True  # stay true for next round
+    st.rerun()
+
+# If finished
+elif st.session_state.round >= 15 and st.session_state.negotiation_active:
     st.session_state.negotiation_active = False
     st.session_state.trigger_next_round = False
     st.success("Negotiation completed.")
-else:
-    # Clear trigger unless in negotiation loop
-    st.session_state.trigger_next_round = False
