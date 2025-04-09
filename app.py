@@ -48,9 +48,9 @@ if st.session_state.round > 0 or st.session_state.agent1_messages:
         if msg["role"] == "system":
             continue
         if msg["role"] == "user":
-            speaker = "Agent 2"
+            speaker = "Seller"
         elif msg["role"] == "assistant":
-            speaker = "Agent 1"
+            speaker = "Buyer"
         else:
             speaker = "Unknown"
         st.markdown(f"**{speaker}:** {msg['content']}")
